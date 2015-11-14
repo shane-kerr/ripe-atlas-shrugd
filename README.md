@@ -1,5 +1,5 @@
 # ripe-atlas-shrugd
-# Fake DNS resolver check using RIPE Atlas
+Fake DNS resolver check using RIPE Atlas
 
 ## To start
 
