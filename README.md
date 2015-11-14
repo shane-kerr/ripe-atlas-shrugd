@@ -3,7 +3,7 @@ Fake DNS resolver check using RIPE Atlas
 
 ## To start
 
-https://github.com/RIPE-NCC/ripe-atlas-cousteau
 ```
-$ pip3 install --user ripe.atlas.cousteau
+$ pip3 install --user ripe.atlas.cousteau  # for creating measurement
+$ pip3 install --user dnspython3           # for parsing zone files 
 ```
