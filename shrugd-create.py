@@ -1,17 +1,33 @@
+import sys
 import ripe.atlas.cousteau
 from atlaskeys import create_key
 
+# get the list of IP addresses from a hints file
+if len(sys.argv) != 2:
+    sys.stderr.write("Syntax: " + sys.argv[0] + " hints.txt\n")
+    sys.exit(1)
+
+# get IP addresses to start from (root servers) with a horrible hack
+f = open(sys.argv[1])
+dns_server_ips = [ ]
+for line in f.readlines():
+    line = line.strip()
+    # skip blank lines
+    if line == '':
+        continue
+    # skip comments
+    if line[0] == ';':
+        continue
+    # check for A/AAAA records
+    info = line.split()
+    if info[-2] in ('A', 'AAAA'):
+        dns_server_ips.append(info[-1])
+        
 # DNS query properties
 query_argument = "wide.ad.jp"
 query_type = "AAAA"
 dnssec_ok = True
 set_nsid_bit = True
-
-# IP addresses to start from
-dns_server_ips = [ 
-    "199.7.91.13", "2001:500:2d::d", # D.ROOT-SERVERS.NET
-    "192.203.230.10",                # E.ROOT-SERVERS.NET
-]
 
 def ip_address_family(ip_addr):
     """Return whether an IP address is IPv4 or IPv6"""
@@ -30,10 +46,9 @@ for ip_addr in dns_server_ips:
         query_class="IN",
         set_nsid_bit=set_nsid_bit,
         udp_payload_size=4096,
-        description="shrugd " + query_argument + "/" 
+        description="shrugd " + query_argument + "/" + query_type
     )
     dns_measurements.append(dns_query)
-    break
 
 # XXX: possibly should at least pick good IPv6 servers when querying over IPv6
 source = ripe.atlas.cousteau.AtlasSource(type="area", value="WW", requested=1)
@@ -48,5 +63,5 @@ atlas_request = ripe.atlas.cousteau.AtlasCreateRequest(
 if is_success:
     print("worked, IDs: %s" % response)
 else:
-    print("did not work")
+    print("did not work: %s" % response)
 
